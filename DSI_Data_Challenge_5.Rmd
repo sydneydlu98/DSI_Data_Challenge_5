@@ -13,7 +13,7 @@ output:
      smooth_scroll: true
 ---
 
-```{r mappImage,screenshot.force = TRUE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = "center")
 ```
 
@@ -61,14 +61,17 @@ var <- clean_data %>%
 ```{r}
 GGally::ggcorr(
   var,
-  size = 3,
+  size = 3.2,
   label = TRUE,
-  label_size = 2,
+  label_size = 2.7,
   hjust = .9,
   layout.exp = 2
 ) 
 ```
 
+If the coefficient value lies between ± 0.50 and ± 1, then it is said to be a strong correlation. If the value is near ± 1, then it said to be a perfect correlation: as one variable increases, the other variable tends to also increase (if positive) or decrease (if negative). 
+
+We can see from the plot, we do not have any high negative correlation, but we do have many high positive correlation. Such as the correlation coefficient between Folate_mcg and Thiamin_mg is 1, which is perfect positive correlation, and others like Protein_g and Zinc_mg has a correlation coefficient of 0.9 which is considered high correlation.
 
 # Performing PCA
 
@@ -92,9 +95,10 @@ var_explainded <- summary(pca_data)$importance[2, ]
 cumulative <- cumsum(var_explainded)
 
 var_explained_df <- data.frame(PC = 1:23,
+                               var_explainded = var_explainded,
                                cum_var_explained = cumulative)
 
-head(var_explained_df)
+var_explained_df
 
 var_explained_df %>%
   ggplot(aes(x = PC, y = cum_var_explained, group = 1)) +
@@ -117,25 +121,50 @@ var_explained_df %>%
 ```{r}
 pca_loadings <- as.data.frame(pca_data$rotation) %>%
   dplyr::select(PC1, PC2, PC3) %>%
-  mutate(variable = rownames(pca_data$rotation)) %>%
-  pivot_longer(
-    cols = c('PC1', 'PC2', 'PC3'),
-    names_to = 'PC',
-    values_to = 'loadings'
-  )
+  mutate(variable = rownames(pca_data$rotation))
 
-ggplot(pca_loadings, aes(x = variable,
-                         y = loadings)) +
-  geom_bar(stat = 'identity') +
-  facet_wrap(~ PC) +
+
+pc1 <- ggplot(pca_loadings, aes(x = variable,
+                                y = abs(PC1))) +
+  geom_bar(stat = 'identity', fill = "#FF6666") +
   theme(axis.text.x = element_text(
-    angle = 60,
+    angle = 50,
     hjust = 1,
-    size = 6
+    size = 13
   )) +
-  ggtitle("Plots for the loadings for the first 3 PCs for all of the variables") +
+  ggtitle("Plot for the loadings of PC1 for all of the variables") +
   theme(plot.title = element_text(hjust = 0.5, size = 16)) +
   labs(y = "Loadings", x = "Variables")
+
+pc1
+
+pc2 <- ggplot(pca_loadings, aes(x = variable,
+                                y = abs(PC2))) +
+  geom_bar(stat = 'identity', fill = "darkgreen") +
+  theme(axis.text.x = element_text(
+    angle = 50,
+    hjust = 1,
+    size = 13
+  )) +
+  ggtitle("Plot for the loadings of PC2 for all of the variables") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  labs(y = "Loadings", x = "Variables")
+
+pc2
+
+pc3 <- ggplot(pca_loadings, aes(x = variable,
+                                y = abs(PC3))) +
+  geom_bar(stat = 'identity', fill = "blue") +
+  theme(axis.text.x = element_text(
+    angle = 50,
+    hjust = 1,
+    size = 13
+  )) +
+  ggtitle("Plot for the loadings of PC3 for all of the variables") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  labs(y = "Loadings", x = "Variables")
+
+pc3
 ```
 
 4. Make 3 plots of the scores on the PCs colored by food group. Plot the below scores. Make the plots interactive with plotly so you can identify the food description of any outliers.
@@ -147,7 +176,7 @@ pca_scores <- pca_scores %>%
   mutate(FoodGroup = clean_data$FoodGroup) %>%
   mutate(description = clean_data$ShortDescrip)
 
-head(pca_scores)
+pca_scores
 ```
 
 * 1. PC1 versus PC2
@@ -227,9 +256,10 @@ var_explainded_new <- summary(pca_data_new)$importance[2,]
 cumulative_new <- cumsum(var_explainded_new)
 
 var_explained_df_new <- data.frame(PC = 1:23,
+                                   var_explainded = var_explainded_new, 
                                    cum_var_explained = cumulative_new)
 
-head(var_explained_df_new)
+var_explained_df_new
 
 var_explained_df_new %>%
   ggplot(aes(x = PC, y = cum_var_explained, group = 1)) +
@@ -245,30 +275,55 @@ var_explained_df_new %>%
     xintercept = 3,
     linetype = 2,
     lwd = 1,
-    col = "blue"
+    col = "red"
   )
 
 pca_loadings_new <- as.data.frame(pca_data_new$rotation) %>%
   dplyr::select(PC1, PC2, PC3) %>%
-  mutate(variable = rownames(pca_data_new$rotation)) %>%
-  pivot_longer(
-    cols = c('PC1', 'PC2', 'PC3'),
-    names_to = 'PC',
-    values_to = 'loadings'
-  )
+  mutate(variable = rownames(pca_data_new$rotation))
 
-ggplot(pca_loadings_new, aes(x = variable,
-                             y = loadings)) +
-  geom_bar(stat = 'identity') +
-  facet_wrap( ~ PC) +
+
+pc1_new <- ggplot(pca_loadings_new, aes(x = variable,
+                                y = abs(PC1))) +
+  geom_bar(stat = 'identity', fill = "#FF6666") +
   theme(axis.text.x = element_text(
-    angle = 60,
+    angle = 50,
     hjust = 1,
-    size = 6
+    size = 13
   )) +
-  ggtitle("Plots for the loadings for the first 3 PCs for all of the variables \n (without outlier)") +
+  ggtitle("Plot for the loadings of PC1 for all of the variables \n (without outlier)") +
   theme(plot.title = element_text(hjust = 0.5, size = 16)) +
   labs(y = "Loadings", x = "Variables")
+
+pc1_new
+
+pc2_new <- ggplot(pca_loadings_new, aes(x = variable,
+                                y = abs(PC2))) +
+  geom_bar(stat = 'identity', fill = "darkgreen") +
+  theme(axis.text.x = element_text(
+    angle = 50,
+    hjust = 1,
+    size = 13
+  )) +
+  ggtitle("Plot for the loadings of PC2 for all of the variables \n (without outlier)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  labs(y = "Loadings", x = "Variables")
+
+pc2_new
+
+pc3_new <- ggplot(pca_loadings_new, aes(x = variable,
+                                y = abs(PC3))) +
+  geom_bar(stat = 'identity', fill = "blue") +
+  theme(axis.text.x = element_text(
+    angle = 50,
+    hjust = 1,
+    size = 13
+  )) +
+  ggtitle("Plot for the loadings of PC3 for all of the variables \n (without outlier)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  labs(y = "Loadings", x = "Variables")
+
+pc3_new
 
 pca_scores_new <- as.data.frame(pca_data_new$x)
 
