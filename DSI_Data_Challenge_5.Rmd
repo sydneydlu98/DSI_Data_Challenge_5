@@ -71,7 +71,7 @@ GGally::ggcorr(
 
 If the coefficient value lies between ± 0.50 and ± 1, then it is said to be a strong correlation. If the value is near ± 1, then it said to be a perfect correlation: as one variable increases, the other variable tends to also increase (if positive) or decrease (if negative). 
 
-We can see from the plot, we do not have any high negative correlation, but we do have many high positive correlation. Such as the correlation coefficient between Folate_mcg and Thiamin_mg is 1, which is perfect positive correlation, and others like Protein_g and Zinc_mg has a correlation coefficient of 0.9 which is considered high correlation.
+We can see from the plot, we do not have any high negative correlation, but we do have many high positive correlation. Such as the correlation coefficient between Folate_mcg and Thiamin_mg is 1, which is perfect positive correlation, and others like Protein_g and Zinc_mg have a correlation coefficient of 0.9 which is considered high correlation.
 
 # Performing PCA
 
