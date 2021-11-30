@@ -1,0 +1,124 @@
+---
+title: "DSI_Data_Challenge_5"
+author: "Dingxin Lu"
+date: "11/29/2021"
+output: 
+  html_document:
+   df_print: paged
+   toc: true 
+   toc_depth: 2  
+   number_sections: false
+   toc_float:
+     collapsed: true
+     smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = "center")
+```
+
+[My Github link] https://github.com/sydneydlu98/DSI_Data_Challenge_5
+
+# Loading/Cleaning Data and Exploratory Analysis
+In this Data Challenge, we will be clustering foods from the nndb_flat dataset provided on Canvas. To load/clean the data as well as perform some exploratory analysis:
+
+1. Read in the data
+
+```{r, message=FALSE}
+## load all the packages
+library(readr)
+library(dplyr)
+library(GGally)
+library(tidyverse)
+
+## read in data
+data <- read_csv("nndb_flat.csv")
+```
+
+2. We will be dealing with only data that falls under the food groups of Vegetables and Vegetable Products, Beef Products, and Sweets. Filter the data to contain only these food groups.
+
+```{r}
+## filter the data to only contain food groups of Vegetables and Vegetable Products, Beef Products, and Sweets
+object <- c("Sweets", "Beef Products", "Vegetables and Vegetable Products")
+
+clean_data <- data %>%
+  subset(FoodGroup == object)
+```
+
+3. Select only the variables from Energy_kcal to Zinc_mg
+
+```{r}
+var <- clean_data %>%
+  select(Energy_kcal:Zinc_mg)
+```
+
+4. Examine the correlation among the variables using GGally::ggcorr. Which variables have a high correlation?
+
+```{r}
+GGally::ggcorr(var)
+```
+
+
+# Performing PCA
+Steps for performing the PCA on the data:
+
+1. Perform PCA on the data. Don’t forget to scale the data (if it is appropriate for this application)!
+```{r}
+data_scaled <- scale(var)
+
+pca_data <- prcomp(data_scaled, center = FALSE, scale. = FALSE)
+
+summary(pca_data)
+```
+
+2. Make a plot showing the cumulative proportion of the variation explained by each PC with cumulative variation explained on the y-axis and PC on the x-axis.
+
+```{r}
+var_explained_df <- data.frame(PC = paste0("PC", 1:23),
+                               var_explained = summary(pca_data)$importance[2, ])
+
+var_explained_df
+
+var_explained_df %>%
+  ggplot(aes(x = PC, y = var_explained, group = 1)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "Scree plot: PCA",
+       y = 'Cumulative variation explained',
+       x = 'PC')
+```
+
+3. We will look at the first 3 PCs which explain about 60% of the variation in the data. Note that you may want to look at more depending on what your application is. Make 3 separate plots for the loadings for the first 3 PCs for all of the variables, ordered by the absolute value of the magnitude of the loadings.
+
+```{r}
+pca_loadings <- as.data.frame(pca_data$rotation) %>%
+  dplyr::select(PC1, PC2, PC3) %>%
+  mutate(variable = rownames(pca_data$rotation)) %>%
+  pivot_longer(
+    cols = c('PC1', 'PC2', 'PC3'),
+    names_to = 'PC',
+    values_to = 'loadings'
+  )
+
+ggplot(pca_loadings, aes(x = variable, 
+                         y = loadings)) +
+  geom_bar(stat = 'identity') +
+  facet_wrap( ~ PC)
+```
+
+4. Make 3 plots of the scores on the PCs colored by food group. Plot the below scores. Make the plots interactive with plotly so you can identify the food description of any outliers.
+
+* 1. PC1 versus PC2
+* 2. PC1 versus PC3
+* 3. PC2 versus PC3
+
+
+# Identify Outlier and Performing PCA Again
+1. There is a major outlier on the plots above – which food is the outlier? Remove the outlier from your data.
+
+2. Perform PCA again on the dataset without the outlier (steps 1-4 in the Performing PCA section above) and look at the loadings of the first 3 PCs. Have these changed? Investigate and comment on what could have caused any changes.
+
+3. Describe what you see in the plots of the scores and interpret this in conjunction with the loadings that you observed for the PCs.
+
+
+
