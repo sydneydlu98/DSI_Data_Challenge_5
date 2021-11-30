@@ -13,7 +13,7 @@ output:
      smooth_scroll: true
 ---
 
-```{r setup, include=FALSE}
+```{r mappImage,screenshot.force = TRUE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = "center")
 ```
 
@@ -59,7 +59,14 @@ var <- clean_data %>%
 4. Examine the correlation among the variables using GGally::ggcorr. Which variables have a high correlation?
 
 ```{r}
-GGally::ggcorr(var)
+GGally::ggcorr(
+  var,
+  size = 3,
+  label = TRUE,
+  label_size = 2,
+  hjust = .9,
+  layout.exp = 2
+) 
 ```
 
 
@@ -87,7 +94,7 @@ cumulative <- cumsum(var_explainded)
 var_explained_df <- data.frame(PC = 1:23,
                                cum_var_explained = cumulative)
 
-var_explained_df
+head(var_explained_df)
 
 var_explained_df %>%
   ggplot(aes(x = PC, y = cum_var_explained, group = 1)) +
@@ -140,7 +147,7 @@ pca_scores <- pca_scores %>%
   mutate(FoodGroup = clean_data$FoodGroup) %>%
   mutate(description = clean_data$ShortDescrip)
 
-pca_scores
+head(pca_scores)
 ```
 
 * 1. PC1 versus PC2
@@ -197,18 +204,120 @@ ggplotly(plot3)
 Then we remove this outlier.
 
 ```{r}
-
+## remove the outlier I identified above
+complete_data <- clean_data %>%
+  filter(ShortDescrip != "YEAST EXTRACT SPREAD")
 ```
 
 2. Perform PCA again on the dataset without the outlier (steps 1-4 in the Performing PCA section above) and look at the loadings of the first 3 PCs. Have these changed? Investigate and comment on what could have caused any changes.
 
 ```{r}
+var_new <- complete_data %>%
+  select(Energy_kcal:Zinc_mg)
 
+data_scaled_new <- scale(var_new)
+
+pca_data_new <- prcomp(data_scaled_new,
+                       center = FALSE,
+                       scale. = FALSE)
+
+summary(pca_data_new)
+
+var_explainded_new <- summary(pca_data_new)$importance[2,]
+cumulative_new <- cumsum(var_explainded_new)
+
+var_explained_df_new <- data.frame(PC = 1:23,
+                                   cum_var_explained = cumulative_new)
+
+head(var_explained_df_new)
+
+var_explained_df_new %>%
+  ggplot(aes(x = PC, y = cum_var_explained, group = 1)) +
+  geom_point() +
+  geom_line(lwd = 1) +
+  labs(title = "Scree Plot: PCA",
+       y = 'Cumulative Variation Explained',
+       x = 'PC') +
+  ggtitle("Plot of cumulative proportion of the variation explained by each PC \n (without outlier)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  # add line for better visualization
+  geom_vline(
+    xintercept = 3,
+    linetype = 2,
+    lwd = 1,
+    col = "blue"
+  )
+
+pca_loadings_new <- as.data.frame(pca_data_new$rotation) %>%
+  dplyr::select(PC1, PC2, PC3) %>%
+  mutate(variable = rownames(pca_data_new$rotation)) %>%
+  pivot_longer(
+    cols = c('PC1', 'PC2', 'PC3'),
+    names_to = 'PC',
+    values_to = 'loadings'
+  )
+
+ggplot(pca_loadings_new, aes(x = variable,
+                             y = loadings)) +
+  geom_bar(stat = 'identity') +
+  facet_wrap( ~ PC) +
+  theme(axis.text.x = element_text(
+    angle = 60,
+    hjust = 1,
+    size = 6
+  )) +
+  ggtitle("Plots for the loadings for the first 3 PCs for all of the variables \n (without outlier)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  labs(y = "Loadings", x = "Variables")
+
+pca_scores_new <- as.data.frame(pca_data_new$x)
+
+pca_scores_new <- pca_scores_new %>%
+  mutate(FoodGroup = complete_data$FoodGroup) %>%
+  mutate(description = complete_data$ShortDescrip)
+
+pca_scores_new
+
+plot1_new <- ggplot(pca_scores_new,
+                    aes(
+                      x = PC1,
+                      y = PC2,
+                      col = FoodGroup,
+                      label = description
+                    )) +
+  geom_point() +
+  ggtitle("PC1 versus PC2 (without outlier)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+
+ggplotly(plot1_new)
+
+plot2_new <- ggplot(pca_scores_new,
+                    aes(
+                      x = PC1,
+                      y = PC3,
+                      col = FoodGroup,
+                      label = description
+                    )) +
+  geom_point() +
+  ggtitle("PC1 versus PC3 (without outlier)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+
+ggplotly(plot2_new)
+
+plot3_new <- ggplot(pca_scores_new,
+                    aes(
+                      x = PC2,
+                      y = PC3,
+                      col = FoodGroup,
+                      label = description
+                    )) +
+  geom_point() +
+  ggtitle("PC2 versus PC3 (without outlier)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+
+ggplotly(plot3_new)
 ```
 
 3. Describe what you see in the plots of the scores and interpret this in conjunction with the loadings that you observed for the PCs.
 
-```{r}
-
-```
 
