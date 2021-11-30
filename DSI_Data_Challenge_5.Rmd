@@ -30,6 +30,7 @@ library(readr)
 library(dplyr)
 library(GGally)
 library(tidyverse)
+library(plotly)
 
 ## read in data
 data <- read_csv("nndb_flat.csv")
@@ -108,17 +109,64 @@ ggplot(pca_loadings, aes(x = variable,
 
 4. Make 3 plots of the scores on the PCs colored by food group. Plot the below scores. Make the plots interactive with plotly so you can identify the food description of any outliers.
 
+```{r}
+pca_scores <- as.data.frame(pca_data$x)
+
+pca_scores <- pca_scores %>%
+  mutate(FoodGroup = clean_data$FoodGroup)
+
+head(pca_scores)
+```
+
 * 1. PC1 versus PC2
+
+```{r}
+plot1 <- ggplot(pca_scores, aes(x = PC1,
+                                y = PC2,
+                                col = FoodGroup)) +
+  geom_point()
+
+ggplotly(plot1)
+```
+
 * 2. PC1 versus PC3
+
+```{r}
+plot2 <- ggplot(pca_scores, aes(x = PC1, 
+                       y = PC3, 
+                       col = FoodGroup)) +
+  geom_point()
+
+ggplotly(plot2)
+```
+
 * 3. PC2 versus PC3
 
+```{r}
+plot3 <- ggplot(pca_scores, aes(x = PC2, 
+                       y = PC3, 
+                       col = FoodGroup)) +
+  geom_point()
+
+ggplotly(plot3)
+```
 
 # Identify Outlier and Performing PCA Again
 1. There is a major outlier on the plots above – which food is the outlier? Remove the outlier from your data.
 
+```{r}
+
+```
+
 2. Perform PCA again on the dataset without the outlier (steps 1-4 in the Performing PCA section above) and look at the loadings of the first 3 PCs. Have these changed? Investigate and comment on what could have caused any changes.
+
+```{r}
+
+```
 
 3. Describe what you see in the plots of the scores and interpret this in conjunction with the loadings that you observed for the PCs.
 
+```{r}
 
+```
 
