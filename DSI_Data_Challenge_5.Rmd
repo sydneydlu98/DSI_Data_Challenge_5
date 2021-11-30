@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align =
 [My Github link] https://github.com/sydneydlu98/DSI_Data_Challenge_5
 
 # Loading/Cleaning Data and Exploratory Analysis
+
 In this Data Challenge, we will be clustering foods from the nndb_flat dataset provided on Canvas. To load/clean the data as well as perform some exploratory analysis:
 
 1. Read in the data
@@ -61,6 +62,7 @@ GGally::ggcorr(var)
 
 
 # Performing PCA
+
 Steps for performing the PCA on the data:
 
 1. Perform PCA on the data. Don’t forget to scale the data (if it is appropriate for this application)!
@@ -152,6 +154,7 @@ ggplotly(plot3)
 ```
 
 # Identify Outlier and Performing PCA Again
+
 1. There is a major outlier on the plots above – which food is the outlier? Remove the outlier from your data.
 
 ```{r}
