@@ -32,6 +32,7 @@ library(dplyr)
 library(GGally)
 library(tidyverse)
 library(plotly)
+library(ggplot2)
 
 ## read in data
 data <- read_csv("nndb_flat.csv")
@@ -41,10 +42,11 @@ data <- read_csv("nndb_flat.csv")
 
 ```{r}
 ## filter the data to only contain food groups of Vegetables and Vegetable Products, Beef Products, and Sweets
-object <- c("Sweets", "Beef Products", "Vegetables and Vegetable Products")
+object <-
+  c("Sweets", "Beef Products", "Vegetables and Vegetable Products")
 
 clean_data <- data %>%
-  subset(FoodGroup == object)
+  subset(FoodGroup %in% object)
 ```
 
 3. Select only the variables from Energy_kcal to Zinc_mg
@@ -69,26 +71,38 @@ Steps for performing the PCA on the data:
 ```{r}
 data_scaled <- scale(var)
 
-pca_data <- prcomp(data_scaled, center = FALSE, scale. = FALSE)
+pca_data <- prcomp(data_scaled, 
+                   center = FALSE, 
+                   scale. = FALSE)
 
 summary(pca_data)
 ```
 
-2. Make a plot showing the cumulative proportion of the variation explained by each PC with cumulative variation explained on the y-axis and PC on the x-axis.
+2. Makat1e a plot showing the cumulative proportion of the variation explained by each PC with cumulative variation explained on the y-axis and PC on the x-axis.
 
 ```{r}
-var_explained_df <- data.frame(PC = paste0("PC", 1:23),
-                               var_explained = summary(pca_data)$importance[2, ])
+var_explainded <- summary(pca_data)$importance[2, ]
+cumulative <- cumsum(var_explainded)
+
+var_explained_df <- data.frame(PC = 1:23,
+                               cum_var_explained = cumulative)
 
 var_explained_df
 
 var_explained_df %>%
-  ggplot(aes(x = PC, y = var_explained, group = 1)) +
+  ggplot(aes(x = PC, y = cum_var_explained, group = 1)) +
   geom_point() +
-  geom_line() +
-  labs(title = "Scree plot: PCA",
-       y = 'Cumulative variation explained',
-       x = 'PC')
+  geom_line(lwd = 1) +
+  labs(title = "Scree Plot: PCA",
+       y = 'Cumulative Variation Explained',
+       x = 'PC') +
+  ggtitle("Plot of cumulative proportion of the variation explained by each PC") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  # add line for better visualization
+  geom_vline(xintercept = 3,
+             linetype = 2,
+             lwd = 1,
+             col = "red") 
 ```
 
 3. We will look at the first 3 PCs which explain about 60% of the variation in the data. Note that you may want to look at more depending on what your application is. Make 3 separate plots for the loadings for the first 3 PCs for all of the variables, ordered by the absolute value of the magnitude of the loadings.
@@ -103,10 +117,18 @@ pca_loadings <- as.data.frame(pca_data$rotation) %>%
     values_to = 'loadings'
   )
 
-ggplot(pca_loadings, aes(x = variable, 
+ggplot(pca_loadings, aes(x = variable,
                          y = loadings)) +
   geom_bar(stat = 'identity') +
-  facet_wrap( ~ PC)
+  facet_wrap(~ PC) +
+  theme(axis.text.x = element_text(
+    angle = 60,
+    hjust = 1,
+    size = 6
+  )) +
+  ggtitle("Plots for the loadings for the first 3 PCs for all of the variables") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  labs(y = "Loadings", x = "Variables")
 ```
 
 4. Make 3 plots of the scores on the PCs colored by food group. Plot the below scores. Make the plots interactive with plotly so you can identify the food description of any outliers.
@@ -115,29 +137,39 @@ ggplot(pca_loadings, aes(x = variable,
 pca_scores <- as.data.frame(pca_data$x)
 
 pca_scores <- pca_scores %>%
-  mutate(FoodGroup = clean_data$FoodGroup)
+  mutate(FoodGroup = clean_data$FoodGroup) %>%
+  mutate(description = clean_data$ShortDescrip)
 
-head(pca_scores)
+pca_scores
 ```
 
 * 1. PC1 versus PC2
 
 ```{r}
-plot1 <- ggplot(pca_scores, aes(x = PC1,
-                                y = PC2,
-                                col = FoodGroup)) +
-  geom_point()
-
+plot1 <- ggplot(pca_scores,
+                aes(
+                  x = PC1,
+                  y = PC2,
+                  col = FoodGroup,
+                  label = description
+                )) +
+  geom_point() +
+  ggtitle("PC1 versus PC2") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+  
 ggplotly(plot1)
 ```
 
 * 2. PC1 versus PC3
 
 ```{r}
-plot2 <- ggplot(pca_scores, aes(x = PC1, 
-                       y = PC3, 
-                       col = FoodGroup)) +
-  geom_point()
+plot2 <- ggplot(pca_scores, aes(x = PC1,
+                                y = PC3,
+                                col = FoodGroup,
+                                label = description)) +
+  geom_point() +
+  ggtitle("PC1 versus PC3") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
 
 ggplotly(plot2)
 ```
@@ -147,8 +179,11 @@ ggplotly(plot2)
 ```{r}
 plot3 <- ggplot(pca_scores, aes(x = PC2, 
                        y = PC3, 
-                       col = FoodGroup)) +
-  geom_point()
+                       col = FoodGroup,
+                       label = description)) +
+  geom_point() +
+  ggtitle("PC2 versus PC3") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
 
 ggplotly(plot3)
 ```
@@ -156,6 +191,10 @@ ggplotly(plot3)
 # Identify Outlier and Performing PCA Again
 
 1. There is a major outlier on the plots above – which food is the outlier? Remove the outlier from your data.
+
+**The major outlier on the plots above is yeast extract spread from the food group vegetable and vegatable products.**
+
+Then we remove this outlier.
 
 ```{r}
 
