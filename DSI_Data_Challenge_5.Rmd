@@ -45,6 +45,7 @@ data <- read_csv("nndb_flat.csv")
 object <-
   c("Sweets", "Beef Products", "Vegetables and Vegetable Products")
 
+## subset the data
 clean_data <- data %>%
   subset(FoodGroup %in% object)
 ```
@@ -52,6 +53,7 @@ clean_data <- data %>%
 3. Select only the variables from Energy_kcal to Zinc_mg
 
 ```{r}
+## select variables from Energy_kcal to Zinc_mg
 var <- clean_data %>%
   select(Energy_kcal:Zinc_mg)
 ```
@@ -59,6 +61,7 @@ var <- clean_data %>%
 4. Examine the correlation among the variables using GGally::ggcorr. Which variables have a high correlation?
 
 ```{r}
+## examine the correlation
 GGally::ggcorr(
   var,
   size = 3.2,
@@ -79,27 +82,36 @@ Steps for performing the PCA on the data:
 
 1. Perform PCA on the data. Don’t forget to scale the data (if it is appropriate for this application)!
 ```{r}
+## scale the data 
 data_scaled <- scale(var)
 
-pca_data <- prcomp(data_scaled, 
-                   center = FALSE, 
+## perform PCA
+pca_data <- prcomp(data_scaled,
+                   center = FALSE,
                    scale. = FALSE)
 
 summary(pca_data)
 ```
 
-2. Makat1e a plot showing the cumulative proportion of the variation explained by each PC with cumulative variation explained on the y-axis and PC on the x-axis.
+2. Make a plot showing the cumulative proportion of the variation explained by each PC with cumulative variation explained on the y-axis and PC on the x-axis.
 
 ```{r}
-var_explainded <- summary(pca_data)$importance[2, ]
+## extract the proportion of the variation explained by each PC
+var_explainded <- summary(pca_data)$importance[2,]
+
+## calculate the cumulative proportion of the variation explained by each PC
 cumulative <- cumsum(var_explainded)
 
-var_explained_df <- data.frame(PC = 1:23,
-                               var_explainded = var_explainded,
-                               cum_var_explained = cumulative)
+## create the table for cumulative proportion of the variation explained by each PC
+var_explained_df <- data.frame(
+  PC = 1:23,
+  var_explainded = var_explainded,
+  cum_var_explained = cumulative
+)
 
 var_explained_df
 
+## plot the graph for cumulative proportion of the variation explained by each PC
 var_explained_df %>%
   ggplot(aes(x = PC, y = cum_var_explained, group = 1)) +
   geom_point() +
@@ -110,20 +122,23 @@ var_explained_df %>%
   ggtitle("Plot of cumulative proportion of the variation explained by each PC") +
   theme(plot.title = element_text(hjust = 0.5, size = 16)) +
   # add line for better visualization
-  geom_vline(xintercept = 3,
-             linetype = 2,
-             lwd = 1,
-             col = "red") 
+  geom_vline(
+    xintercept = 3,
+    linetype = 2,
+    lwd = 1,
+    col = "red"
+  ) 
 ```
 
 3. We will look at the first 3 PCs which explain about 60% of the variation in the data. Note that you may want to look at more depending on what your application is. Make 3 separate plots for the loadings for the first 3 PCs for all of the variables, ordered by the absolute value of the magnitude of the loadings.
 
 ```{r}
+## create the data frame for the loadings of PC1, PC2, PC3
 pca_loadings <- as.data.frame(pca_data$rotation) %>%
   dplyr::select(PC1, PC2, PC3) %>%
   mutate(variable = rownames(pca_data$rotation))
 
-
+## Plot for the loadings of PC1 for all of the variables
 pc1 <- ggplot(pca_loadings, aes(x = variable,
                                 y = abs(PC1))) +
   geom_bar(stat = 'identity', fill = "#FF6666") +
@@ -138,6 +153,7 @@ pc1 <- ggplot(pca_loadings, aes(x = variable,
 
 pc1
 
+## Plot for the loadings of PC2 for all of the variables
 pc2 <- ggplot(pca_loadings, aes(x = variable,
                                 y = abs(PC2))) +
   geom_bar(stat = 'identity', fill = "darkgreen") +
@@ -152,6 +168,7 @@ pc2 <- ggplot(pca_loadings, aes(x = variable,
 
 pc2
 
+## Plot for the loadings of PC3 for all of the variables
 pc3 <- ggplot(pca_loadings, aes(x = variable,
                                 y = abs(PC3))) +
   geom_bar(stat = 'identity', fill = "blue") +
@@ -170,8 +187,10 @@ pc3
 4. Make 3 plots of the scores on the PCs colored by food group. Plot the below scores. Make the plots interactive with plotly so you can identify the food description of any outliers.
 
 ```{r}
+## make the data frame for the scores on the PCs
 pca_scores <- as.data.frame(pca_data$x)
 
+## add 2 columns to make the plots
 pca_scores <- pca_scores %>%
   mutate(FoodGroup = clean_data$FoodGroup) %>%
   mutate(description = clean_data$ShortDescrip)
@@ -182,6 +201,7 @@ pca_scores
 * 1. PC1 versus PC2
 
 ```{r}
+## make the plot of scores on the PCs (PC1 versus PC2)
 plot1 <- ggplot(pca_scores,
                 aes(
                   x = PC1,
@@ -192,17 +212,21 @@ plot1 <- ggplot(pca_scores,
   geom_point() +
   ggtitle("PC1 versus PC2") +
   theme(plot.title = element_text(hjust = 0.5, size = 16))
-  
+
 ggplotly(plot1)
 ```
 
 * 2. PC1 versus PC3
 
 ```{r}
-plot2 <- ggplot(pca_scores, aes(x = PC1,
-                                y = PC3,
-                                col = FoodGroup,
-                                label = description)) +
+## make the plot of scores on the PCs (PC1 versus PC3)
+plot2 <- ggplot(pca_scores,
+                aes(
+                  x = PC1,
+                  y = PC3,
+                  col = FoodGroup,
+                  label = description
+                )) +
   geom_point() +
   ggtitle("PC1 versus PC3") +
   theme(plot.title = element_text(hjust = 0.5, size = 16))
@@ -213,10 +237,14 @@ ggplotly(plot2)
 * 3. PC2 versus PC3
 
 ```{r}
-plot3 <- ggplot(pca_scores, aes(x = PC2, 
-                       y = PC3, 
-                       col = FoodGroup,
-                       label = description)) +
+## make the plot of scores on the PCs (PC2 versus PC3)
+plot3 <- ggplot(pca_scores,
+                aes(
+                  x = PC2,
+                  y = PC3,
+                  col = FoodGroup,
+                  label = description
+                )) +
   geom_point() +
   ggtitle("PC2 versus PC3") +
   theme(plot.title = element_text(hjust = 0.5, size = 16))
@@ -241,6 +269,7 @@ complete_data <- clean_data %>%
 2. Perform PCA again on the dataset without the outlier (steps 1-4 in the Performing PCA section above) and look at the loadings of the first 3 PCs. Have these changed? Investigate and comment on what could have caused any changes.
 
 ```{r}
+## re-run steps 1-4 in the Performing PCA section above
 var_new <- complete_data %>%
   select(Energy_kcal:Zinc_mg)
 
