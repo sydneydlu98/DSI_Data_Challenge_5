@@ -139,8 +139,8 @@ pca_loadings <- as.data.frame(pca_data$rotation) %>%
   mutate(variable = rownames(pca_data$rotation))
 
 ## Plot for the loadings of PC1 for all of the variables
-pc1 <- ggplot(pca_loadings, aes(x = variable,
-                                y = abs(PC1))) +
+pc1 <- ggplot(pca_loadings, aes(x = reorder(variable, abs(PC1)),
+                                y = PC1)) +
   geom_bar(stat = 'identity', fill = "#FF6666") +
   theme(axis.text.x = element_text(
     angle = 50,
@@ -154,8 +154,8 @@ pc1 <- ggplot(pca_loadings, aes(x = variable,
 pc1
 
 ## Plot for the loadings of PC2 for all of the variables
-pc2 <- ggplot(pca_loadings, aes(x = variable,
-                                y = abs(PC2))) +
+pc2 <- ggplot(pca_loadings, aes(x = reorder(variable, abs(PC2)),
+                                y = PC2)) +
   geom_bar(stat = 'identity', fill = "darkgreen") +
   theme(axis.text.x = element_text(
     angle = 50,
@@ -169,8 +169,8 @@ pc2 <- ggplot(pca_loadings, aes(x = variable,
 pc2
 
 ## Plot for the loadings of PC3 for all of the variables
-pc3 <- ggplot(pca_loadings, aes(x = variable,
-                                y = abs(PC3))) +
+pc3 <- ggplot(pca_loadings, aes(x = reorder(variable, abs(PC3)),
+                                y = PC3)) +
   geom_bar(stat = 'identity', fill = "blue") +
   theme(axis.text.x = element_text(
     angle = 50,
@@ -312,8 +312,9 @@ pca_loadings_new <- as.data.frame(pca_data_new$rotation) %>%
   mutate(variable = rownames(pca_data_new$rotation))
 
 
-pc1_new <- ggplot(pca_loadings_new, aes(x = variable,
-                                y = abs(PC1))) +
+pc1_new <-
+  ggplot(pca_loadings_new, aes(x = reorder(variable, abs(PC1)),
+                               y = PC1)) +
   geom_bar(stat = 'identity', fill = "#FF6666") +
   theme(axis.text.x = element_text(
     angle = 50,
@@ -326,8 +327,9 @@ pc1_new <- ggplot(pca_loadings_new, aes(x = variable,
 
 pc1_new
 
-pc2_new <- ggplot(pca_loadings_new, aes(x = variable,
-                                y = abs(PC2))) +
+pc2_new <-
+  ggplot(pca_loadings_new, aes(x = reorder(variable, abs(PC2)),
+                               y = PC2)) +
   geom_bar(stat = 'identity', fill = "darkgreen") +
   theme(axis.text.x = element_text(
     angle = 50,
@@ -340,8 +342,9 @@ pc2_new <- ggplot(pca_loadings_new, aes(x = variable,
 
 pc2_new
 
-pc3_new <- ggplot(pca_loadings_new, aes(x = variable,
-                                y = abs(PC3))) +
+pc3_new <-
+  ggplot(pca_loadings_new, aes(x = reorder(variable, abs(PC3)),
+                               y = PC3)) +
   geom_bar(stat = 'identity', fill = "blue") +
   theme(axis.text.x = element_text(
     angle = 50,
