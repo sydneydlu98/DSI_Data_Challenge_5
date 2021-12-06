@@ -1,3 +1,4 @@
+
 ---
 title: "DSI_Data_Challenge_5"
 author: "Dingxin Lu"
@@ -33,7 +34,6 @@ library(GGally)
 library(tidyverse)
 library(plotly)
 library(ggplot2)
-
 ## read in data
 data <- read_csv("nndb_flat.csv")
 ```
@@ -83,8 +83,9 @@ Steps for performing the PCA on the data:
 1. Perform PCA on the data. Don’t forget to scale the data (if it is appropriate for this application)!
 ```{r}
 ## scale the data 
-data_scaled <- scale(var)
-
+data_scaled <- scale(var, 
+                     center = TRUE,
+                     scale = TRUE)
 ## perform PCA
 pca_data <- prcomp(data_scaled,
                    center = FALSE,
@@ -103,24 +104,23 @@ var_explainded <- summary(pca_data)$importance[2,]
 cumulative <- cumsum(var_explainded)
 
 ## create the table for cumulative proportion of the variation explained by each PC
-var_explained_df <- data.frame(
-  PC = 1:23,
-  var_explainded = var_explainded,
-  cum_var_explained = cumulative
+var_explained_df <- data.frame(PC = 1:23,
+                               var_explainded = var_explainded,
+                               cum_var_explained = cumulative
 )
-
-var_explained_df
 
 ## plot the graph for cumulative proportion of the variation explained by each PC
 var_explained_df %>%
-  ggplot(aes(x = PC, y = cum_var_explained, group = 1)) +
+  ggplot(aes(x = PC, 
+             y = cum_var_explained, 
+             group = 1)) +
   geom_point() +
   geom_line(lwd = 1) +
-  labs(title = "Scree Plot: PCA",
-       y = 'Cumulative Variation Explained',
-       x = 'PC') +
+  labs(x = 'Number of PCs',
+       y = 'Cumulative Variation Explained') +
   ggtitle("Plot of cumulative proportion of the variation explained by each PC") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16)) +
   # add line for better visualization
   geom_vline(
     xintercept = 3,
@@ -135,51 +135,64 @@ var_explained_df %>%
 ```{r}
 ## create the data frame for the loadings of PC1, PC2, PC3
 pca_loadings <- as.data.frame(pca_data$rotation) %>%
-  dplyr::select(PC1, PC2, PC3) %>%
+  dplyr::select(PC1, 
+                PC2, 
+                PC3) %>%
   mutate(variable = rownames(pca_data$rotation))
 
 ## Plot for the loadings of PC1 for all of the variables
-pc1 <- ggplot(pca_loadings, aes(x = reorder(variable, abs(PC1)),
+pc1 <- ggplot(pca_loadings, aes(x = reorder(variable, 
+                                            abs(PC1)),
                                 y = PC1)) +
-  geom_bar(stat = 'identity', fill = "#FF6666") +
+  geom_bar(stat = 'identity', 
+           fill = "#FF6666") +
   theme(axis.text.x = element_text(
     angle = 50,
     hjust = 1,
     size = 13
   )) +
   ggtitle("Plot for the loadings of PC1 for all of the variables") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
-  labs(y = "Loadings", x = "Variables")
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16)) +
+  labs(x = "Variables",
+       y = "Loadings")
 
 pc1
 
 ## Plot for the loadings of PC2 for all of the variables
-pc2 <- ggplot(pca_loadings, aes(x = reorder(variable, abs(PC2)),
+pc2 <- ggplot(pca_loadings, aes(x = reorder(variable, 
+                                            abs(PC2)),
                                 y = PC2)) +
-  geom_bar(stat = 'identity', fill = "darkgreen") +
+  geom_bar(stat = 'identity', 
+           fill = "darkgreen") +
   theme(axis.text.x = element_text(
     angle = 50,
     hjust = 1,
     size = 13
   )) +
   ggtitle("Plot for the loadings of PC2 for all of the variables") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
-  labs(y = "Loadings", x = "Variables")
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16)) +
+  labs(x = "Variables",
+       y = "Loadings")
 
 pc2
 
 ## Plot for the loadings of PC3 for all of the variables
-pc3 <- ggplot(pca_loadings, aes(x = reorder(variable, abs(PC3)),
+pc3 <- ggplot(pca_loadings, aes(x = reorder(variable, 
+                                            abs(PC3)),
                                 y = PC3)) +
-  geom_bar(stat = 'identity', fill = "blue") +
-  theme(axis.text.x = element_text(
-    angle = 50,
-    hjust = 1,
-    size = 13
+  geom_bar(stat = 'identity', 
+           fill = "blue") +
+  theme(axis.text.x = element_text(angle = 50,
+                                   hjust = 1,
+                                   size = 13
   )) +
   ggtitle("Plot for the loadings of PC3 for all of the variables") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
-  labs(y = "Loadings", x = "Variables")
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16)) +
+  labs(x = "Variables",
+       y = "Loadings")
 
 pc3
 ```
@@ -203,15 +216,15 @@ pca_scores
 ```{r}
 ## make the plot of scores on the PCs (PC1 versus PC2)
 plot1 <- ggplot(pca_scores,
-                aes(
-                  x = PC1,
-                  y = PC2,
-                  col = FoodGroup,
-                  label = description
+                aes(x = PC1,
+                    y = PC2,
+                    col = FoodGroup,
+                    label = description
                 )) +
   geom_point() +
   ggtitle("PC1 versus PC2") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16))
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16))
 
 ggplotly(plot1)
 ```
@@ -221,15 +234,15 @@ ggplotly(plot1)
 ```{r}
 ## make the plot of scores on the PCs (PC1 versus PC3)
 plot2 <- ggplot(pca_scores,
-                aes(
-                  x = PC1,
-                  y = PC3,
-                  col = FoodGroup,
-                  label = description
+                aes(x = PC1,
+                    y = PC3,
+                    col = FoodGroup,
+                    label = description
                 )) +
   geom_point() +
   ggtitle("PC1 versus PC3") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16))
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16))
 
 ggplotly(plot2)
 ```
@@ -239,15 +252,15 @@ ggplotly(plot2)
 ```{r}
 ## make the plot of scores on the PCs (PC2 versus PC3)
 plot3 <- ggplot(pca_scores,
-                aes(
-                  x = PC2,
-                  y = PC3,
-                  col = FoodGroup,
-                  label = description
+                aes(x = PC2,
+                    y = PC3,
+                    col = FoodGroup,
+                    label = description
                 )) +
   geom_point() +
   ggtitle("PC2 versus PC3") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16))
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16))
 
 ggplotly(plot3)
 ```
@@ -273,7 +286,10 @@ complete_data <- clean_data %>%
 var_new <- complete_data %>%
   select(Energy_kcal:Zinc_mg)
 
-data_scaled_new <- scale(var_new)
+## scale and center the filtered data without outlier
+data_scaled_new <- scale(var_new, 
+                         center = TRUE,
+                         scale = TRUE)
 
 pca_data_new <- prcomp(data_scaled_new,
                        center = FALSE,
@@ -283,20 +299,18 @@ summary(pca_data_new)
 
 var_explainded_new <- summary(pca_data_new)$importance[2,]
 cumulative_new <- cumsum(var_explainded_new)
-
 var_explained_df_new <- data.frame(PC = 1:23,
                                    var_explainded = var_explainded_new, 
                                    cum_var_explained = cumulative_new)
 
-var_explained_df_new
-
 var_explained_df_new %>%
-  ggplot(aes(x = PC, y = cum_var_explained, group = 1)) +
+  ggplot(aes(x = PC, 
+             y = cum_var_explained, 
+             group = 1)) +
   geom_point() +
   geom_line(lwd = 1) +
-  labs(title = "Scree Plot: PCA",
-       y = 'Cumulative Variation Explained',
-       x = 'PC') +
+  labs(x = 'Number of PCs',
+       y = 'Cumulative Variation Explained') +
   ggtitle("Plot of cumulative proportion of the variation explained by each PC \n (without outlier)") +
   theme(plot.title = element_text(hjust = 0.5, size = 16)) +
   # add line for better visualization
@@ -311,49 +325,62 @@ pca_loadings_new <- as.data.frame(pca_data_new$rotation) %>%
   dplyr::select(PC1, PC2, PC3) %>%
   mutate(variable = rownames(pca_data_new$rotation))
 
-
 pc1_new <-
-  ggplot(pca_loadings_new, aes(x = reorder(variable, abs(PC1)),
-                               y = PC1)) +
-  geom_bar(stat = 'identity', fill = "#FF6666") +
+  ggplot(pca_loadings_new, 
+         aes(x = reorder(variable,
+                         abs(PC1)),
+             y = PC1)) +
+  geom_bar(stat = 'identity', 
+           fill = "#FF6666") +
   theme(axis.text.x = element_text(
     angle = 50,
     hjust = 1,
     size = 13
   )) +
   ggtitle("Plot for the loadings of PC1 for all of the variables \n (without outlier)") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16)) +
   labs(y = "Loadings", x = "Variables")
 
 pc1_new
 
 pc2_new <-
-  ggplot(pca_loadings_new, aes(x = reorder(variable, abs(PC2)),
-                               y = PC2)) +
-  geom_bar(stat = 'identity', fill = "darkgreen") +
+  ggplot(pca_loadings_new, 
+         aes(x = reorder(variable,
+                         abs(PC2)),
+             y = PC2)) +
+  geom_bar(stat = 'identity', 
+           fill = "darkgreen") +
   theme(axis.text.x = element_text(
     angle = 50,
     hjust = 1,
     size = 13
   )) +
   ggtitle("Plot for the loadings of PC2 for all of the variables \n (without outlier)") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
-  labs(y = "Loadings", x = "Variables")
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16)) +
+  labs(x = "Variables",
+       y = "Loadings")
 
 pc2_new
 
 pc3_new <-
-  ggplot(pca_loadings_new, aes(x = reorder(variable, abs(PC3)),
-                               y = PC3)) +
-  geom_bar(stat = 'identity', fill = "blue") +
+  ggplot(pca_loadings_new, 
+         aes(x = reorder(variable, 
+                         abs(PC3)),
+             y = PC3)) +
+  geom_bar(stat = 'identity', 
+           fill = "blue") +
   theme(axis.text.x = element_text(
     angle = 50,
     hjust = 1,
     size = 13
   )) +
   ggtitle("Plot for the loadings of PC3 for all of the variables \n (without outlier)") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
-  labs(y = "Loadings", x = "Variables")
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16)) +
+  labs(x = "Variables",
+       y = "Loadings")
 
 pc3_new
 
@@ -374,7 +401,8 @@ plot1_new <- ggplot(pca_scores_new,
                     )) +
   geom_point() +
   ggtitle("PC1 versus PC2 (without outlier)") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16))
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16))
 
 ggplotly(plot1_new)
 
@@ -387,7 +415,8 @@ plot2_new <- ggplot(pca_scores_new,
                     )) +
   geom_point() +
   ggtitle("PC1 versus PC3 (without outlier)") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16))
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16))
 
 ggplotly(plot2_new)
 
@@ -400,11 +429,11 @@ plot3_new <- ggplot(pca_scores_new,
                     )) +
   geom_point() +
   ggtitle("PC2 versus PC3 (without outlier)") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16))
+  theme(plot.title = element_text(hjust = 0.5, 
+                                  size = 16))
 
 ggplotly(plot3_new)
+
 ```
 
 3. Describe what you see in the plots of the scores and interpret this in conjunction with the loadings that you observed for the PCs.
-
-
