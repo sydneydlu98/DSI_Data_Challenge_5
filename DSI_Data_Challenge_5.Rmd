@@ -34,6 +34,7 @@ library(GGally)
 library(tidyverse)
 library(plotly)
 library(ggplot2)
+
 ## read in data
 data <- read_csv("nndb_flat.csv")
 ```
@@ -72,9 +73,9 @@ GGally::ggcorr(
 ) 
 ```
 
-If the coefficient value lies between ± 0.50 and ± 1, then it is said to be a strong correlation. If the value is near ± 1, then it said to be a perfect correlation: as one variable increases, the other variable tends to also increase (if positive) or decrease (if negative). 
+**If the coefficient value lies between ± 0.50 and ± 1, then it is said to be a strong correlation. If the value is near ± 1, then it said to be a perfect correlation: as one variable increases, the other variable tends to also increase (if positive) or decrease (if negative).** 
 
-We can see from the plot, we do not have any high negative correlation, but we do have many high positive correlation. Such as the correlation coefficient between Folate_mcg and Thiamin_mg is 1, which is perfect positive correlation, and others like Protein_g and Zinc_mg have a correlation coefficient of 0.9 which is considered high correlation.
+**We can see from the plot, we do not have any high negative correlation, but we do have many high positive correlations. Such as the correlation coefficient between Folate_mcg and Thiamin_mg is 1, which is perfect positive correlation, and others like Protein_g and Zinc_mg have a correlation coefficient of 0.9 which is considered high correlation. As well as the correlation coefficient between carb_g and sugar_g which is 0.8, this is also considered high correlation.** 
 
 # Performing PCA
 
@@ -437,7 +438,23 @@ plot3_new <- ggplot(pca_scores_new,
                                   size = 16))
 
 ggplotly(plot3_new)
-
 ```
 
+**By looking at the loadings of the first 3 PCs, they do have things changed. We are able to see the loading of folate_mcg changed from positive loading to almost no loading, it is because the outlier: yeast extract spread has a insanely high value of folate_mcg compares to others, so when we get rid of the outlier, we would expect the loading of folates_mcg in PC1 to go down; The loadings in PC2 have a small change but nothing significant; Then in the loadings of PC3, we are able to observe many big changes, such as vitA_mcg, vitB12-mcg and Manganese_mg change from negative loadings to positive loadings, as well as folate_mcg changed from positive loading to almost no loading and Niacin_mg changes from large positive loading to almost no loading. It makes sense because outlier has extremely large value for Folate_mcg and Niacin_mg, so get rid of the outlier should significantly decrease the loadings in PCs.** 
+
 3. Describe what you see in the plots of the scores and interpret this in conjunction with the loadings that you observed for the PCs.
+
+**There is no outlier anymore in our new plots of scores and we are able to see in 3 biplots, each PC is not separate from each other and there is some overlaping between between 3 food groups in each biplot. **
+
+**The orientation (direction) of the vector, with respect to the principal component space, in particular, its angle with the principal component axes: the more parallel to a principal component axis is a vector, the more it contributes only to that PC. We are able to see vegetable and vegetable products are parallel to PC2 which means the more it contributes only to PC2. **
+
+**The length in the space which indicates the longer the vector, the more variability of this variable is represented by the two displayed principal components; short vectors are thus better represented in other dimension. So, we are able to see beef products are well represented by each of 3 plots with PC1, PC2 and PC3 as many beef products have the longest length in each of the plot, and vegetable and vegetable products are well represented by PC1 and PC2.**
+
+**Because a PCA biplot simply merges an usual PCA plot with a plot of loadings. The arrangement is like this:**
+
+* Bottom axis: PC1 score; 
+* Left axis: PC2 score; 
+* Top axis: loadings on PC1; 
+* Right axis: loadings on PC2. 
+
+**So our biplots coincides with loadings of each PC.**
