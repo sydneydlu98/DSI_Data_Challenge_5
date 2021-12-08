@@ -91,8 +91,6 @@ data_scaled <- scale(var,
 pca_data <- prcomp(data_scaled,
                    center = FALSE,
                    scale. = FALSE)
-
-summary(pca_data)
 ```
 
 2. Make a plot showing the cumulative proportion of the variation explained by each PC with cumulative variation explained on the y-axis and PC on the x-axis.
@@ -212,8 +210,6 @@ pca_scores <- as.data.frame(pca_data$x)
 pca_scores <- pca_scores %>%
   mutate(FoodGroup = clean_data$FoodGroup) %>%
   mutate(description = clean_data$ShortDescrip)
-
-pca_scores
 ```
 
 * 1. PC1 versus PC2
@@ -299,8 +295,6 @@ data_scaled_new <- scale(var_new,
 pca_data_new <- prcomp(data_scaled_new,
                        center = FALSE,
                        scale. = FALSE)
-
-summary(pca_data_new)
 
 var_explainded_new <- summary(pca_data_new)$importance[2,]
 cumulative_new <- cumsum(var_explainded_new)
@@ -394,8 +388,6 @@ pca_scores_new <- as.data.frame(pca_data_new$x)
 pca_scores_new <- pca_scores_new %>%
   mutate(FoodGroup = complete_data$FoodGroup) %>%
   mutate(description = complete_data$ShortDescrip)
-
-pca_scores_new
 
 plot1_new <- ggplot(pca_scores_new,
                     aes(
