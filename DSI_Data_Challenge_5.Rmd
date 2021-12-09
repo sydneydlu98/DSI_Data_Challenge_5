@@ -292,16 +292,23 @@ data_scaled_new <- scale(var_new,
                          center = TRUE,
                          scale = TRUE)
 
+## perform PCA on new data
 pca_data_new <- prcomp(data_scaled_new,
                        center = FALSE,
                        scale. = FALSE)
 
+## extract the proportion of the variation explained by each PC
 var_explainded_new <- summary(pca_data_new)$importance[2,]
+
+## calculate the cumulative proportion of the variation explained by each PC
 cumulative_new <- cumsum(var_explainded_new)
+
+## create the table for cumulative proportion of the variation explained by each PC
 var_explained_df_new <- data.frame(PC = 1:23,
                                    var_explainded = var_explainded_new, 
                                    cum_var_explained = cumulative_new)
 
+## plot the graph for cumulative proportion of the variation explained by each PC
 var_explained_df_new %>%
   ggplot(aes(x = PC, 
              y = cum_var_explained, 
@@ -320,10 +327,12 @@ var_explained_df_new %>%
     col = "red"
   )
 
+## create the data frame for the loadings of PC1, PC2, PC3
 pca_loadings_new <- as.data.frame(pca_data_new$rotation) %>%
   dplyr::select(PC1, PC2, PC3) %>%
   mutate(variable = rownames(pca_data_new$rotation))
 
+## Plot for the loadings of PC1 for all of the variables
 pc1_new <-
   ggplot(pca_loadings_new, 
          aes(x = reorder(variable,
@@ -343,6 +352,7 @@ pc1_new <-
 
 pc1_new
 
+## Plot for the loadings of PC2 for all of the variables
 pc2_new <-
   ggplot(pca_loadings_new, 
          aes(x = reorder(variable,
@@ -363,6 +373,7 @@ pc2_new <-
 
 pc2_new
 
+## Plot for the loadings of PC3 for all of the variables
 pc3_new <-
   ggplot(pca_loadings_new, 
          aes(x = reorder(variable, 
@@ -383,12 +394,15 @@ pc3_new <-
 
 pc3_new
 
+## make the data frame for the scores on the PCs
 pca_scores_new <- as.data.frame(pca_data_new$x)
 
+## add 2 columns to make the plots
 pca_scores_new <- pca_scores_new %>%
   mutate(FoodGroup = complete_data$FoodGroup) %>%
   mutate(description = complete_data$ShortDescrip)
 
+## make the plot of scores on the PCs (PC1 versus PC2)
 plot1_new <- ggplot(pca_scores_new,
                     aes(
                       x = PC1,
@@ -403,6 +417,7 @@ plot1_new <- ggplot(pca_scores_new,
 
 ggplotly(plot1_new)
 
+## make the plot of scores on the PCs (PC1 versus PC3)
 plot2_new <- ggplot(pca_scores_new,
                     aes(
                       x = PC1,
@@ -417,6 +432,7 @@ plot2_new <- ggplot(pca_scores_new,
 
 ggplotly(plot2_new)
 
+## make the plot of scores on the PCs (PC2 versus PC3)
 plot3_new <- ggplot(pca_scores_new,
                     aes(
                       x = PC2,
