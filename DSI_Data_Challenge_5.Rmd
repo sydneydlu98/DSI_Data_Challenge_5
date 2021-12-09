@@ -432,21 +432,16 @@ plot3_new <- ggplot(pca_scores_new,
 ggplotly(plot3_new)
 ```
 
-**By looking at the loadings of the first 3 PCs, they do notice there are things changed. We are able to see the loading of folate_mcg changed from positive loading to almost no loading, it is because the outlier: yeast extract spread has a insanely high value of folate_mcg compares to others, so when we get rid of the outlier, we would expect the loading of folates_mcg in PC1 to go down; The loadings in PC2 have small changes but nothing significant; Then in the loadings of PC3, we are able to observe many big changes, such as vitA_mcg, vitB12-mcg and Manganese_mg change from negative loadings to positive loadings, as well as folate_mcg changed from positive loading to almost no loading and Niacin_mg changes from large positive loading to almost no loading. It makes sense because outlier has extremely large value for Folate_mcg and Niacin_mg, so get rid of the outlier should significantly decrease the loadings in PCs.** 
+**By looking at the loadings of the first 3 PCs, they do notice there are things changed. We are able to see the loading of folate_mcg changed from positive loading to almost no loading, it is because the outlier: yeast extract spread has a insanely high value of folate_mcg compares to others, so when we get rid of the outlier, we would expect the loading of folates_mcg in PC1 to go down; The loadings in PC2 have small changes but nothing significant; Then in the loadings of PC3, we are able to observe many big changes, such as vitA_mcg, vitB12-mcg and Manganese_mg change from large negative loadings to large positive loadings, as well as folate_mcg changed from positive loading to almost no loading and Niacin_mg changes from large positive loading to almost no loading. It makes sense because outlier has extremely large value for Folate_mcg and Niacin_mg, so get rid of the outlier should significantly decrease the loadings in PCs.** 
 
 3. Describe what you see in the plots of the scores and interpret this in conjunction with the loadings that you observed for the PCs.
 
-**There is no outlier anymore in our new plots of scores and we are able to see in 3 biplots, they all have some overlapping between 3 food groups and the distance among these 3 food groups are near, as the nearer the distance are these 3 groups from each other, meaning there are more similarities among them (it is according to the variability that explain the two axes).**
+**There is no outlier anymore in our new plots of scores and we are able to see in 3 biplots, they all have some overlapping between 3 food groups and the distance among these 3 food groups are near, as the nearer the distance are these 3 groups from each other, meaning there are more similarities among them in terms of nutritional elements (Points that are close to each other in the biplot represent observations with similar values).**
 
 **The orientation (direction) of the vector, with respect to the principal component space, in particular, its angle with the principal component axes: the more parallel to a principal component axis is a vector, the more it contributes only to that PC. We are able to see vegetable and vegetable products are parallel to PC2 which means the more it contributes only to PC2. **
 
+**Also highly correlated variables point in similar directions; uncorrelated variables are nearly perpendicular to each other. So we are able to see, in the first biplot, many beef products are highly correlated with vegetable and vegetable products in terms of food nutritional elements.**
+
 **The length in the space which indicates the longer the vector, the more variability of this variable is represented by the two displayed principal components; short vectors are thus better represented in other dimension. So, we are able to see beef products are well represented by each of 3 biplots with PC1, PC2 and PC3 as many beef products have the longest length in each of the plot, and vegetable and vegetable products are well represented by PC1 and PC2 in the first biplot.**
 
-**Because a PCA biplot simply merges an usual PCA plot with a plot of loadings. The arrangement for the first biplot is like this:**
-
-* Bottom axis: PC1 score
-* Left axis: PC2 score 
-* Top axis: loadings on PC1
-* Right axis: loadings on PC2 
-
-**So our biplots coincides with loadings of each PC.**
+**Because a PCA biplot combines both the principal component scores and the loading vectors in a single biplot display. We are able to interpret loadings in our PCA biplot. We can see most of the loadings in PC1 and PC2 are positive, so we would expect the majority of points to be situated in the first quadrant (both x-axis and y-axis are positive) of the first biplot (PC1 VS PC2); However, many loadings in PC3 are negative, so we would expect most of points in biplots of PC1 VS PC3 and PC2 and PC3 to be mostly situated in the fourth quadrant (where x-axis is positive and y-axis is negative).** 
